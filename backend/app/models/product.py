@@ -4,10 +4,10 @@ from sqlalchemy import (
     String,
     Float,
     Boolean,
-    DateTime
+    DateTime,
+    Index,
+    func
 )
-
-from datetime import datetime
 
 from app.database.base import Base
 
@@ -34,16 +34,27 @@ class Product(Base):
 
     mrp = Column(Float)
 
-    selling_price = Column(Float)
+    selling_price = Column(Float, nullable=False)
 
     cost_price = Column(Float)
 
     is_active = Column(Boolean, default=True)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(
+        DateTime,
+        server_default=func.now(),
+        nullable=False
+    )
 
     updated_at = Column(
         DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
     )
+
+    __table_args__ = (
+        Index("ix_products_product_name", "product_name"),
+        Index("ix_products_brand", "brand"),
+        Index("ix_products_category", "category"),
+    )

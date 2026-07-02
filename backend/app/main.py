@@ -7,12 +7,18 @@ from app.database.connection import engine
 import app.models
 from app.api.product import router as product_router
 
+from app.core.handlers import register_exception_handlers
+
 
 app = FastAPI(
     title="AI Inventory Intelligence Platform",
     version="1.0.0",
     description="An AI-powered Inventory Management Platform inspired by Zepto and Blinkit"
 )
+
+
+# Register all custom exception handlers
+register_exception_handlers(app)
 
 
 # Register all API routes

@@ -1,14 +1,32 @@
+from contextlib import contextmanager
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.models.product import Product
+from app.core.exceptions import DuplicateSKUException
 
 
 class ProductRepository:
 
+    @contextmanager
+    def _transaction(self, db: Session):
+        try:
+            yield
+            db.commit()
+        except IntegrityError as e:
+            db.rollback()
+            error_message = str(e).lower()
+            if "sku" in error_message:
+                raise DuplicateSKUException()
+            raise e
+        except Exception as e:
+            db.rollback()
+            raise e
+
     def create(self, db: Session, product: Product):
-        db.add(product)
-        db.commit()
+        with self._transaction(db):
+            db.add(product)
         db.refresh(product)
         return product
 
@@ -67,10 +85,12 @@ class ProductRepository:
         )
 
     def update(self, db: Session, product: Product):
-        db.commit()
+        with self._transaction(db):
+            pass
         db.refresh(product)
         return product
 
     def delete(self, db: Session, product: Product):
-        db.delete(product)
-        db.commit()
+        with self._transaction(db):
+            db.delete(product)
+        return product

@@ -1,5 +1,4 @@
-from fastapi import HTTPException
-
+from app.core.exceptions import ProductNotFoundException
 from app.models.product import Product
 from app.repositories.product_repository import ProductRepository
 
@@ -52,10 +51,7 @@ class ProductService:
         product = repository.get_by_id(db, product_id)
 
         if not product:
-            raise HTTPException(
-                status_code=404,
-                detail="Product not found"
-            )
+            raise ProductNotFoundException()
 
         return product
 
@@ -64,10 +60,7 @@ class ProductService:
         product = repository.get_by_id(db, product_id)
 
         if not product:
-            raise HTTPException(
-                status_code=404,
-                detail="Product not found"
-            )
+            raise ProductNotFoundException()
 
         product.sku = request.sku
         product.product_name = request.product_name
@@ -86,10 +79,7 @@ class ProductService:
         product = repository.get_by_id(db, product_id)
 
         if not product:
-            raise HTTPException(
-                status_code=404,
-                detail="Product not found"
-            )
+            raise ProductNotFoundException()
 
         repository.delete(db, product)
 
