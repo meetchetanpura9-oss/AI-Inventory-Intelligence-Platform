@@ -6,6 +6,12 @@ from app.database.connection import engine
 
 import app.models
 from app.api.product import router as product_router
+from app.api.inventory import router as inventory_router
+from app.api.inventory_transaction import router as inventory_transaction_router
+from app.api.sale import router as sale_router
+from app.api.purchase import router as purchase_router
+from app.api.analytics import router as analytics_router
+from app.customer_search.routes import router as customer_search_router
 
 from app.core.handlers import register_exception_handlers
 
@@ -23,6 +29,12 @@ register_exception_handlers(app)
 
 # Register all API routes
 app.include_router(product_router)
+app.include_router(inventory_router)
+app.include_router(inventory_transaction_router)
+app.include_router(sale_router)
+app.include_router(purchase_router)
+app.include_router(analytics_router)
+app.include_router(customer_search_router)
 
 
 # Create all database tables
