@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.models.product import Product
 from app.core.exceptions import DuplicateSKUException
+from app.repositories.inventory_repository import repository as inventory_repository
 
 
 class ProductRepository:
@@ -27,6 +28,8 @@ class ProductRepository:
     def create(self, db: Session, product: Product):
         with self._transaction(db):
             db.add(product)
+            db.flush()
+            inventory_repository.create_for_product(db, product.id)
         db.refresh(product)
         return product
 
@@ -93,4 +96,4 @@ class ProductRepository:
     def delete(self, db: Session, product: Product):
         with self._transaction(db):
             db.delete(product)
-        return product
+        return product
