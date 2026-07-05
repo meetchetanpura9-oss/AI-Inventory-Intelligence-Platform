@@ -13,7 +13,7 @@ router = APIRouter(
 service = ProductService()
 
 
-@router.post("/", response_model=ProductResponse, status_code=201)
+@router.post("", response_model=ProductResponse, status_code=201)
 def create_product(
     request: ProductCreate,
     db: Session = Depends(get_db)
@@ -22,7 +22,7 @@ def create_product(
 
 
 
-@router.get("/", response_model=list[ProductResponse])
+@router.get("", response_model=list[ProductResponse])
 def get_products(
     search: str | None = None,
     category: str | None = None,

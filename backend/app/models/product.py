@@ -8,6 +8,7 @@ from sqlalchemy import (
     Index,
     func
 )
+from sqlalchemy.orm import relationship
 
 from app.database.base import Base
 
@@ -51,6 +52,27 @@ class Product(Base):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
+    )
+
+    inventory = relationship(
+        "Inventory",
+        back_populates="product",
+        uselist=False
+    )
+
+    transactions = relationship(
+        "InventoryTransaction",
+        back_populates="product"
+    )
+
+    sales = relationship(
+        "Sale",
+        back_populates="product"
+    )
+
+    purchases = relationship(
+        "Purchase",
+        back_populates="product"
     )
 
     __table_args__ = (

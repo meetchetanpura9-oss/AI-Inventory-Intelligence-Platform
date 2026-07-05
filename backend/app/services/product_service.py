@@ -1,6 +1,8 @@
 from app.core.exceptions import ProductNotFoundException
 from app.models.product import Product
 from app.repositories.product_repository import ProductRepository
+from app.repositories.inventory_repository import repository as inventory_repository
+from app.repositories.inventory_transaction_repository import repository as transaction_repository
 
 repository = ProductRepository()
 
@@ -81,6 +83,8 @@ class ProductService:
         if not product:
             raise ProductNotFoundException()
 
+        inventory_repository.delete_by_product(db, product_id)
+        transaction_repository.delete_by_product(db, product_id)
         repository.delete(db, product)
 
         return {

@@ -2,7 +2,17 @@ from sqlalchemy.orm import Session
 
 from app.customer_search.models import CustomerSearch
 from app.customer_search.repository import repository
-from app.customer_search.schemas import CustomerSearchCreate, CustomerSearchResponse, SearchProductInfo
+from app.customer_search.schemas import (
+    CustomerSearchCreate,
+    CustomerSearchResponse,
+    SearchProductInfo,
+    SearchHistoryResponse,
+    FailedSearchResponse,
+    TopProductResponse,
+    TopFailedProductResponse,
+    CityAnalyticsResponse,
+    AreaAnalyticsResponse,
+)
 from app.services.product_service import ProductService
 
 product_service = ProductService()
@@ -66,5 +76,34 @@ class CustomerSearchService:
             search_id=saved.id,
         )
 
+    def get_search_history(self, db: Session) -> list[SearchHistoryResponse]:
+        records = repository.get_search_history(db)
+        return [SearchHistoryResponse.model_validate(r) for r in records]
+
+    def get_failed_searches(self, db: Session) -> list[FailedSearchResponse]:
+        records = repository.get_failed_searches(db)
+        return [FailedSearchResponse.model_validate(r) for r in records]
+
+    def get_top_products(self, db: Session, limit: int = 10) -> list[TopProductResponse]:
+        if limit <= 0:
+            limit = 10
+        records = repository.get_top_products(db, limit=limit)
+        return [TopProductResponse.model_validate(r) for r in records]
+
+    def get_top_failed_products(self, db: Session, limit: int = 10) -> list[TopFailedProductResponse]:
+        if limit <= 0:
+            limit = 10
+        records = repository.get_top_failed_products(db, limit=limit)
+        return [TopFailedProductResponse.model_validate(r) for r in records]
+
+    def get_city_analytics(self, db: Session) -> list[CityAnalyticsResponse]:
+        records = repository.get_city_analytics(db)
+        return [CityAnalyticsResponse.model_validate(r) for r in records]
+
+    def get_area_analytics(self, db: Session) -> list[AreaAnalyticsResponse]:
+        records = repository.get_area_analytics(db)
+        return [AreaAnalyticsResponse.model_validate(r) for r in records]
+
 
 service = CustomerSearchService()
+

@@ -72,6 +72,12 @@ class InventoryRepository:
             db.delete(inventory)
         return inventory
 
+    def delete_by_product(self, db: Session, product_id: int):
+        inventory = self.get_by_product_id(db, product_id)
+        if inventory:
+            with self._transaction(db):
+                db.delete(inventory)
+
     def get_low_stock(self, db: Session):
         return (
             db.query(Inventory)

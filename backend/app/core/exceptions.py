@@ -14,3 +14,9 @@ class DatabaseException(Exception):
 
     def __init__(self):
         self.message = "Database error occurred."
+
+
+class InsufficientStockException(Exception):
+
+    def __init__(self):
+        self.message = "Insufficient stock"
