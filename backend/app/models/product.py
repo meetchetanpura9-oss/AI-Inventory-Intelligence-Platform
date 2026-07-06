@@ -75,6 +75,12 @@ class Product(Base):
         back_populates="product"
     )
 
+    demands = relationship(
+        "ProductDemand",
+        back_populates="product",
+        cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
         Index("ix_products_product_name", "product_name"),
         Index("ix_products_brand", "brand"),
