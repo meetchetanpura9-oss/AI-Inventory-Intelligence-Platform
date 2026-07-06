@@ -3,6 +3,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
+from fastapi import HTTPException
 from app.models.inventory import Inventory
 from app.core.exceptions import DatabaseException
 
@@ -22,6 +23,16 @@ class InventoryRepository:
             raise DatabaseException()
 
     def create(self, db: Session, inventory: Inventory):
+        existing_inventory = (
+            db.query(Inventory)
+            .filter(Inventory.product_id == inventory.product_id)
+            .first()
+        )
+        if existing_inventory:
+            raise HTTPException(
+                status_code=400,
+                detail="Inventory already exists for this product."
+            )
         with self._transaction(db):
             db.add(inventory)
         db.refresh(inventory)

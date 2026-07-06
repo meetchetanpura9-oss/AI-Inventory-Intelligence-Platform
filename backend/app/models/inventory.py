@@ -19,7 +19,9 @@ class Inventory(Base):
     product_id = Column(
         Integer,
         ForeignKey("products.id"),
-        nullable=False
+        unique=True,
+        nullable=False,
+        index=True
     )
 
     quantity = Column(Integer, default=0, nullable=False)

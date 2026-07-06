@@ -35,6 +35,24 @@ class ProductDemandRepository:
         with self._transaction(db):
             db.add_all(demands)
 
+    def _apply_location_filters(
+        self,
+        query,
+        city: Optional[str],
+        area: Optional[str]
+    ):
+        if city is None and area is None:
+            # Default/Global case: return only global records
+            return query.filter(ProductDemand.city.is_(None), ProductDemand.area.is_(None))
+        
+        # Filtering case: filter by city and/or area if they are provided
+        if city is not None:
+            query = query.filter(ProductDemand.city == city)
+        if area is not None:
+            query = query.filter(ProductDemand.area == area)
+            
+        return query
+
     def get_all_demands(
         self,
         db: Session,
@@ -42,19 +60,7 @@ class ProductDemandRepository:
         area: Optional[str] = None
     ) -> List[ProductDemand]:
         query = db.query(ProductDemand)
-        
-        # Filter by city or default to global (None)
-        if city is not None:
-            query = query.filter(ProductDemand.city == city)
-        else:
-            query = query.filter(ProductDemand.city.is_(None))
-            
-        # Filter by area or default to global (None)
-        if area is not None:
-            query = query.filter(ProductDemand.area == area)
-        else:
-            query = query.filter(ProductDemand.area.is_(None))
-            
+        query = self._apply_location_filters(query, city, area)
         return query.order_by(desc(ProductDemand.demand_score)).all()
 
     def get_high_demand_products(
@@ -64,17 +70,7 @@ class ProductDemandRepository:
         area: Optional[str] = None
     ) -> List[ProductDemand]:
         query = db.query(ProductDemand).filter(ProductDemand.demand_level == "HIGH")
-        
-        if city is not None:
-            query = query.filter(ProductDemand.city == city)
-        else:
-            query = query.filter(ProductDemand.city.is_(None))
-            
-        if area is not None:
-            query = query.filter(ProductDemand.area == area)
-        else:
-            query = query.filter(ProductDemand.area.is_(None))
-            
+        query = self._apply_location_filters(query, city, area)
         return query.order_by(desc(ProductDemand.demand_score)).all()
 
     def get_low_demand_products(
@@ -84,17 +80,7 @@ class ProductDemandRepository:
         area: Optional[str] = None
     ) -> List[ProductDemand]:
         query = db.query(ProductDemand).filter(ProductDemand.demand_level == "LOW")
-        
-        if city is not None:
-            query = query.filter(ProductDemand.city == city)
-        else:
-            query = query.filter(ProductDemand.city.is_(None))
-            
-        if area is not None:
-            query = query.filter(ProductDemand.area == area)
-        else:
-            query = query.filter(ProductDemand.area.is_(None))
-            
+        query = self._apply_location_filters(query, city, area)
         return query.order_by(asc(ProductDemand.demand_score)).all()
 
     def get_product_demand(
@@ -105,17 +91,7 @@ class ProductDemandRepository:
         area: Optional[str] = None
     ) -> Optional[ProductDemand]:
         query = db.query(ProductDemand).filter(ProductDemand.product_id == product_id)
-        
-        if city is not None:
-            query = query.filter(ProductDemand.city == city)
-        else:
-            query = query.filter(ProductDemand.city.is_(None))
-            
-        if area is not None:
-            query = query.filter(ProductDemand.area == area)
-        else:
-            query = query.filter(ProductDemand.area.is_(None))
-            
+        query = self._apply_location_filters(query, city, area)
         return query.first()
 
 
