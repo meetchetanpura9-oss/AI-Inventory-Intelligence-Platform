@@ -162,7 +162,7 @@ class DemandService:
                     loc_score = self.calculate_demand_score(
                         search_count=loc_search_cnt,
                         failed_searches=loc_failed_cnt,
-                        sales_count=0,
+                        sales_count=sales_cnt,
                         current_stock=stock
                     )
                     loc_level = self.determine_demand_level(loc_score)
@@ -173,8 +173,8 @@ class DemandService:
                         area=loc_area,
                         search_count=loc_search_cnt,
                         failed_searches=loc_failed_cnt,
-                        sales_count=0,
-                        purchase_count=0,
+                        sales_count=sales_cnt,
+                        purchase_count=purchases_cnt,
                         current_stock=stock,
                         demand_score=loc_score,
                         demand_level=loc_level
