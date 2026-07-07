@@ -10,7 +10,7 @@ from app.api.inventory import router as inventory_router
 from app.api.inventory_transaction import router as inventory_transaction_router
 from app.api.sale import router as sale_router
 from app.api.purchase import router as purchase_router
-from app.api.analytics import router as analytics_router
+from app.analytics.routes import router as analytics_router
 from app.customer_search.routes import router as customer_search_router
 from app.demand.routes import router as demand_router
 
