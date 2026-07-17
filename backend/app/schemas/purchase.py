@@ -26,9 +26,19 @@ class PurchaseCreate(PurchaseBase):
     pass
 
 
+class ProductInfo(BaseModel):
+    id: int
+    product_name: str
+    sku: str
+
+    class Config:
+        from_attributes = True
+
+
 class PurchaseResponse(PurchaseBase):
     id: int
     created_at: datetime
+    product: ProductInfo | None = None
 
     class Config:
         from_attributes = True

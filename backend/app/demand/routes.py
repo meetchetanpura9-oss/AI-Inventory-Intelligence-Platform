@@ -3,16 +3,25 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database.dependencies import get_db
+from app.permissions.dependencies import require_roles
+from app.permissions.roles import UserRole
 from app.demand.schemas import ProductDemandCalculateResponse, ProductDemandResponse
 from app.demand.service import service
 
 router = APIRouter(prefix="/demand", tags=["Demand Intelligence"])
+can_read_demand = require_roles(
+    UserRole.ADMIN,
+    UserRole.STORE_MANAGER,
+    UserRole.STAFF,
+    UserRole.VIEWER,
+)
 
 
 @router.post(
     "/calculate",
     response_model=ProductDemandCalculateResponse,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(can_read_demand)],
 )
 def calculate_demand(db: Session = Depends(get_db)):
     """
@@ -25,6 +34,7 @@ def calculate_demand(db: Session = Depends(get_db)):
     "",
     response_model=List[ProductDemandResponse],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(can_read_demand)],
 )
 def get_all_demands(
     city: Optional[str] = Query(default=None, description="Filter by city (default None returns global demands)"),
@@ -41,6 +51,7 @@ def get_all_demands(
     "/high",
     response_model=List[ProductDemandResponse],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(can_read_demand)],
 )
 def get_high_demand_products(
     city: Optional[str] = Query(default=None, description="Filter by city (default None returns global demands)"),
@@ -57,6 +68,7 @@ def get_high_demand_products(
     "/low",
     response_model=List[ProductDemandResponse],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(can_read_demand)],
 )
 def get_low_demand_products(
     city: Optional[str] = Query(default=None, description="Filter by city (default None returns global demands)"),
@@ -73,6 +85,7 @@ def get_low_demand_products(
     "/{product_id}",
     response_model=ProductDemandResponse,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(can_read_demand)],
 )
 def get_product_demand(
     product_id: int,

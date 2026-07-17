@@ -9,6 +9,15 @@ class InventoryCreate(BaseModel):
     maximum_stock: int = 100
 
 
+class ProductInfo(BaseModel):
+    id: int
+    product_name: str
+    sku: str
+
+    class Config:
+        from_attributes = True
+
+
 class InventoryResponse(BaseModel):
     id: int
     product_id: int
@@ -17,6 +26,7 @@ class InventoryResponse(BaseModel):
     maximum_stock: int
     created_at: datetime
     updated_at: datetime
+    product: ProductInfo | None = None
 
     class Config:
         from_attributes = True

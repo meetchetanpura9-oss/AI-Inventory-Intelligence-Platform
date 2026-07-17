@@ -22,9 +22,19 @@ class InventoryTransactionCreate(InventoryTransactionBase):
     pass
 
 
+class ProductInfo(BaseModel):
+    id: int
+    product_name: str
+    sku: str
+
+    class Config:
+        from_attributes = True
+
+
 class InventoryTransactionResponse(InventoryTransactionBase):
     id: int
     created_at: datetime
+    product: ProductInfo | None = None
 
     class Config:
         from_attributes = True

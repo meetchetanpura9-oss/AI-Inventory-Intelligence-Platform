@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.dependencies import get_db
+from app.permissions.dependencies import require_roles
+from app.permissions.roles import UserRole
 from app.core.exceptions import ProductNotFoundException
 from app.schemas.purchase import PurchaseCreate, PurchaseResponse
 from app.services.purchase_service import service
@@ -11,8 +13,15 @@ router = APIRouter(
     tags=["Purchase"]
 )
 
+can_access_purchases = require_roles(UserRole.ADMIN, UserRole.STORE_MANAGER)
 
-@router.post("", response_model=PurchaseResponse, status_code=201)
+
+@router.post(
+    "",
+    response_model=PurchaseResponse,
+    status_code=201,
+    dependencies=[Depends(can_access_purchases)]
+)
 def create_purchase(
     request: PurchaseCreate,
     db: Session = Depends(get_db)
@@ -26,7 +35,11 @@ def create_purchase(
         )
 
 
-@router.get("", response_model=list[PurchaseResponse])
+@router.get(
+    "",
+    response_model=list[PurchaseResponse],
+    dependencies=[Depends(can_access_purchases)]
+)
 def get_purchases(
     limit: int = 50,
     offset: int = 0,
@@ -35,7 +48,11 @@ def get_purchases(
     return service.get_purchases(db, limit=limit, offset=offset)
 
 
-@router.get("/{purchase_id}", response_model=PurchaseResponse)
+@router.get(
+    "/{purchase_id}",
+    response_model=PurchaseResponse,
+    dependencies=[Depends(can_access_purchases)]
+)
 def get_purchase(
     purchase_id: int,
     db: Session = Depends(get_db)
@@ -49,7 +66,8 @@ def get_purchase(
 @router.get(
     "/product/{product_id}",
     response_model=list[PurchaseResponse],
-    include_in_schema=False
+    include_in_schema=False,
+    dependencies=[Depends(can_access_purchases)]
 )
 def get_product_purchases(
     product_id: int,

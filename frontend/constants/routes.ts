@@ -1,0 +1,46 @@
+export const ROUTES = {
+  login: "/login",
+  register: "/register",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
+  dashboard: "/dashboard",
+  products: "/products",
+  inventory: "/inventory",
+  transactions: "/transactions",
+  sales: "/sales",
+  purchases: "/purchases",
+  analytics: "/analytics",
+  ai: "/ai",
+  aiForecast: "/ai-forecast",
+  demandIntelligence: "/demand-intelligence",
+  weatherIntelligence: "/weather-intelligence",
+  festivalIntelligence: "/festival-intelligence",
+  users: "/users",
+  profile: "/profile",
+  settings: "/settings",
+} as const;
+
+export const {
+  login,
+  register,
+  forgotPassword,
+  resetPassword,
+  dashboard,
+  products,
+  inventory,
+  transactions,
+  sales,
+  purchases,
+  analytics,
+  ai,
+  aiForecast,
+  demandIntelligence,
+  weatherIntelligence,
+  festivalIntelligence,
+  users,
+  profile,
+  settings,
+} = ROUTES;
+
+export type RouteKey = keyof typeof ROUTES;
+export type AppRoute = (typeof ROUTES)[RouteKey];

@@ -5,3 +5,5 @@ from app.models.sale import Sale
 from app.models.purchase import Purchase
 from app.customer_search.models import CustomerSearch
 from app.demand.models import ProductDemand
+from app.auth.models import User, AccessRequest
+from app.modules.weather.models import WeatherRecord

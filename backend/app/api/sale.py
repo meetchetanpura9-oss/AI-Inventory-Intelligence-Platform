@@ -3,6 +3,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.database.dependencies import get_db
+from app.permissions.dependencies import require_roles
+from app.permissions.roles import UserRole
 from app.core.exceptions import InsufficientStockException, ProductNotFoundException
 from app.schemas.sale import SaleCreate, SaleResponse
 from app.services.sale_service import service
@@ -12,8 +14,19 @@ router = APIRouter(
     tags=["Sales"]
 )
 
+can_access_sales = require_roles(
+    UserRole.ADMIN,
+    UserRole.STORE_MANAGER,
+    UserRole.STAFF,
+)
 
-@router.post("", response_model=SaleResponse, status_code=201)
+
+@router.post(
+    "",
+    response_model=SaleResponse,
+    status_code=201,
+    dependencies=[Depends(can_access_sales)]
+)
 def create_sale(
     request: SaleCreate,
     db: Session = Depends(get_db)
@@ -32,7 +45,11 @@ def create_sale(
         )
 
 
-@router.get("", response_model=list[SaleResponse])
+@router.get(
+    "",
+    response_model=list[SaleResponse],
+    dependencies=[Depends(can_access_sales)]
+)
 def get_sales(
     limit: int = 50,
     offset: int = 0,
@@ -41,7 +58,11 @@ def get_sales(
     return service.get_sales(db, limit=limit, offset=offset)
 
 
-@router.get("/{sale_id}", response_model=SaleResponse)
+@router.get(
+    "/{sale_id}",
+    response_model=SaleResponse,
+    dependencies=[Depends(can_access_sales)]
+)
 def get_sale(
     sale_id: int,
     db: Session = Depends(get_db)
@@ -55,7 +76,8 @@ def get_sale(
 @router.get(
     "/product/{product_id}",
     response_model=list[SaleResponse],
-    include_in_schema=False
+    include_in_schema=False,
+    dependencies=[Depends(can_access_sales)]
 )
 def get_product_sales(
     product_id: int,

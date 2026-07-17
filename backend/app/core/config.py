@@ -6,6 +6,10 @@ class Settings(BaseSettings):
     APP_NAME: str
     DEBUG: bool
     DATABASE_URL: str
+    SECRET_KEY: str = "super-secret-key-change-me-in-production-12345"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     @field_validator("DEBUG", mode="before")
     @classmethod

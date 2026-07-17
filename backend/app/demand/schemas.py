@@ -8,6 +8,8 @@ class ProductInfoSchema(BaseModel):
     id: int
     product_name: str
     sku: str
+    category: str | None = None
+    cost_price: float | None = None
 
     class Config:
         from_attributes = True

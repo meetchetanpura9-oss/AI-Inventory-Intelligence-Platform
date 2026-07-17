@@ -14,8 +14,20 @@ from app.customer_search.schemas import (
 )
 from app.customer_search.service import service
 from app.database.dependencies import get_db
+from app.permissions.dependencies import require_roles
+from app.permissions.roles import UserRole
 
-router = APIRouter(tags=["Customer Search"])
+can_use_search_reports = require_roles(
+    UserRole.ADMIN,
+    UserRole.STORE_MANAGER,
+    UserRole.STAFF,
+    UserRole.VIEWER,
+)
+
+router = APIRouter(
+    tags=["Customer Search"],
+    dependencies=[Depends(can_use_search_reports)],
+)
 
 
 @router.post(
@@ -97,4 +109,3 @@ def get_area_analytics(
     db: Session = Depends(get_db),
 ):
     return service.get_area_analytics(db)
-

@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
@@ -6,7 +7,11 @@ from sqlalchemy.exc import IntegrityError
 from app.core.exceptions import (
     ProductNotFoundException,
     DuplicateSKUException,
-    DatabaseException
+    DatabaseException,
+    DuplicateUsernameException,
+    DuplicateEmailException,
+    InvalidCredentialsException,
+    DuplicatePhoneException
 )
 
 
@@ -47,6 +52,74 @@ def register_exception_handlers(app: FastAPI):
         )
 
     # -----------------------------
+    # Duplicate Username
+    # -----------------------------
+    @app.exception_handler(DuplicateUsernameException)
+    async def duplicate_username_handler(
+        request: Request,
+        exc: DuplicateUsernameException
+    ):
+        return JSONResponse(
+            status_code=409,
+            content={
+                "success": False,
+                "message": exc.message,
+                "data": None
+            }
+        )
+
+    # -----------------------------
+    # Duplicate Email
+    # -----------------------------
+    @app.exception_handler(DuplicateEmailException)
+    async def duplicate_email_handler(
+        request: Request,
+        exc: DuplicateEmailException
+    ):
+        return JSONResponse(
+            status_code=409,
+            content={
+                "success": False,
+                "message": exc.message,
+                "data": None
+            }
+        )
+
+    # -----------------------------
+    # Invalid Credentials
+    # -----------------------------
+    @app.exception_handler(InvalidCredentialsException)
+    async def invalid_credentials_handler(
+        request: Request,
+        exc: InvalidCredentialsException
+    ):
+        return JSONResponse(
+            status_code=401,
+            content={
+                "success": False,
+                "message": exc.message,
+                "data": None
+            }
+        )
+
+    # -----------------------------
+    # Duplicate Phone
+    # -----------------------------
+    @app.exception_handler(DuplicatePhoneException)
+    async def duplicate_phone_handler(
+        request: Request,
+        exc: DuplicatePhoneException
+    ):
+        return JSONResponse(
+            status_code=409,
+            content={
+                "success": False,
+                "message": exc.message,
+                "data": None
+            }
+        )
+
+    # -----------------------------
     # Database Exception
     # -----------------------------
     @app.exception_handler(DatabaseException)
@@ -76,7 +149,7 @@ def register_exception_handlers(app: FastAPI):
             content={
                 "success": False,
                 "message": "Validation Failed",
-                "errors": exc.errors()
+                "errors": jsonable_encoder(exc.errors())
             }
         )
 
@@ -88,8 +161,16 @@ def register_exception_handlers(app: FastAPI):
         request: Request,
         exc: HTTPException
     ):
+        if exc.status_code in (401, 403):
+            return JSONResponse(
+                status_code=exc.status_code,
+                headers=exc.headers,
+                content={"detail": exc.detail}
+            )
+
         return JSONResponse(
             status_code=exc.status_code,
+            headers=exc.headers,
             content={
                 "success": False,
                 "message": exc.detail,
